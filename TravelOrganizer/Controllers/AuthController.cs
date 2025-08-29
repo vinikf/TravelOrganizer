@@ -100,7 +100,7 @@ namespace TravelOrganizer.Api.Controllers
         }
         
         [HttpPost("Refresh")]
-        public async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult, SignInHttpResult, ChallengeHttpResult>> Logout
+        public async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult, SignInHttpResult, ChallengeHttpResult>> Refresh
             ([FromBody] RefreshRequest refreshRequest)
         {
             var refreshTokenProtector = _bearerTokenOptions.Get(IdentityConstants.BearerScheme).RefreshTokenProtector;
