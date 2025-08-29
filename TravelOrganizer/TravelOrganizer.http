@@ -1,0 +1,49 @@
+@TravelOrganizer_HostAddress = https://localhost:7187
+@BearerToken = CfDJ8EaZ50JQDENJtRTymLUn4xwuYcGWFA8e2RxA_vj0NDRiAOGsef_shc-inOQwhOgo2BOJWa6unwQk9MR5pPwUu_u3ouyZqLnXPI5nurYb8V4gpVCc5W8BBfaIsmXEGEjykY4QEtcfXcAKhe1nwwtXtnPThhAjKRLx5WWYpraEItxYNyy8egajbEQSzM2WTNJl9YsBHPjhV2YEiu0BNFf6VC60s8G0O9JWdPia2r0ZPOmAIVmJOb5wxY94U-JSbW1SZMauwFPBZ80EzOe86ZqVc-SatDTpVEiRFzJmCzTpAptXMgSN0bb-DFY-cA6bzejm61sEaTbR5Esf2aA_eaCm3ZgCeHDhGzERyXVLE4PTFz88Ze60zH7cxNchvuu-RN25GpNaUcBH0Da8P1jdlZnryTTa8CMV3_xfV-gwjXysg5QOpkmxIZMRETqfMfxrYL8dMuvXg-59qV7eVKhqliOw-R2IoUdtq4P__tfbZDC_JHd4NAiGj0nvbjwpwpO_x7pYyA-ABx3oPXpnQnJ2RNEz9Ac-V6zEJLYnk-W-6_WLr6DL4-IcKRGPEP0xHynuTbkY6jBJePDsmTVYaT4swSy2sduMmgOvENk50fT4YVetLsU0oWYaKJ3wToDe_Arm4Py_5vtY7EnmI3YCgGGk3zs46pxm6MrnMWjh5yNdAoyZm6r5
+
+
+POST {{TravelOrganizer_HostAddress}}/api/Auth/register
+Content-Type: application/json
+{
+  "Nome": "João",
+  "Sobrenome": "Silva",
+  "Email": "joao.silva@example.com",
+  "Password": "SenhaForte123!",
+  "DataNascimento": "1990-05-15"
+}
+
+###
+
+POST {{TravelOrganizer_HostAddress}}/api/Auth/login
+Content-Type: application/json
+{
+  "email": "joao.silva@example.com",
+  "password": "SenhaForte123!"
+}
+
+###
+POST {{TravelOrganizer_HostAddress}}/api/viagens/Criar
+Content-Type: application/json
+Authorization: Bearer {{BearerToken}}
+{
+  "UsuarioId": 1,
+  "Nome": "Rio de Janeiro",
+  "DataInicio": "2025-06-01",
+  "DataFim": "2025-06-10",
+  "Viajantes": [
+    {
+      "Nome": "João",
+      "Idade": 35,
+      "NecessitaAcessibilidade": false
+    },
+    {
+      "Nome": "Maria",
+      "Idade": 28,
+      "NecessitaAcessibilidade": true
+    }
+  ]
+}
+###
+GET {{TravelOrganizer_HostAddress}}/api/viagens/Listar
+Content-Type: application/json
+Authorization: Bearer {{BearerToken}}
