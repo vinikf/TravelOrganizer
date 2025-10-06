@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TravelOrganizer.Domain\TravelOrganizer.Domain.csproj" />
-    <ProjectReference Include="..\TravelOrganizer.Infrastructure\TravelOrganizer.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

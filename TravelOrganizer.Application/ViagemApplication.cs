@@ -1,66 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TravelOrganizer.Api.Controllers;
-using TravelOrganizer.Domain;
+﻿using TravelOrganizer.Api.Controllers;
+using TravelOrganizer.Application.Interfaces;
 using TravelOrganizer.Domain.DTOs;
 using TravelOrganizer.Domain.Entities;
-using TravelOrganizer.Infrastructure;
 
 namespace TravelOrganizer.Application
 {
-    public class ViagemApplication
+    public class ViagemApplication : IViagemApplication
     {
-        protected UsuarioLogadoDTO UsuarioLogado { get; set; }
+        private readonly IViagemRepository _viagemRepository;
+        private readonly IUsuarioContext _usuarioContext;
 
-        public ViagemApplication(UsuarioLogadoDTO usuarioLogado)
+        public ViagemApplication(IViagemRepository viagemRepository, IUsuarioContext usuarioContext)
         {
-            UsuarioLogado = usuarioLogado;
+            _viagemRepository = viagemRepository;
+            _usuarioContext = usuarioContext;
         }
 
         public async Task CriarViagem(NovaViagemDTO dto)
         {
-
-            try
+            var viagem = new Viagem
             {
-                Viagem viagem = new()
-                {
-                    Nome = dto.Nome,
-                    DataFim = dto.DataFim,
-                    DataInicio = dto.DataInicio,
-                    Roteiros = dto.Roteiros,
-                    UsuarioId = UsuarioLogado.Id,
-                    Viajantes = dto.Viajantes
-                };
+                Nome = dto.Nome,
+                DataFim = dto.DataFim,
+                DataInicio = dto.DataInicio,
+                Roteiros = dto.Roteiros,
+                UsuarioId = _usuarioContext.Usuario.Id,
+                Viajantes = dto.Viajantes
+            };
 
-                using (var db = new ApplicationDbContext())
-                {
-                    var viagemRepository = new ViagensRepository(db, UsuarioLogado);
-                    await viagemRepository.Salvar(viagem);
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            await _viagemRepository.Salvar(viagem);
         }
 
-        public async Task<List<Viagem>> ListarViagens() 
+        public async Task<List<Viagem>> ListarViagens()
         {
-            using (var db = new ApplicationDbContext())
-            {
-                try
-                {
-                    return await new ViagensRepository(db, UsuarioLogado).ObterTodas();
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
-                
-        } 
+            var usuario = _usuarioContext.Usuario;
+            return await _viagemRepository.ObterTodas(usuario.Id);
+        }
     }
 }

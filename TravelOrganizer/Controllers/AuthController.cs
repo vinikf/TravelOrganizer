@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
-using TravelOrganizer.Application.Services;
+using TravelOrganizer.Application.Interfaces;
 using TravelOrganizer.Domain.DTOs;
 using TravelOrganizer.Domain.Entities;
 
@@ -25,9 +25,9 @@ namespace TravelOrganizer.Api.Controllers
         private readonly LinkGenerator linkGenerator;
         private readonly IUserStore<Usuario> _userStore;
         private readonly IOptionsMonitor<BearerTokenOptions> _bearerTokenOptions;
-        private readonly EmailService _emailService;
+        private readonly IEmailService _emailService;
 
-        public AuthController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, LinkGenerator linkGenerator, IUserStore<Usuario> userStore, IOptionsMonitor<BearerTokenOptions> bearerTokenOptions, EmailService emailService)
+        public AuthController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, LinkGenerator linkGenerator, IUserStore<Usuario> userStore, IOptionsMonitor<BearerTokenOptions> bearerTokenOptions, IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -98,7 +98,7 @@ namespace TravelOrganizer.Api.Controllers
 
             return TypedResults.Empty;
         }
-        
+
         [HttpPost("Refresh")]
         public async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult, SignInHttpResult, ChallengeHttpResult>> Refresh
             ([FromBody] RefreshRequest refreshRequest)
@@ -122,6 +122,99 @@ namespace TravelOrganizer.Api.Controllers
         {
             await _signInManager.SignOutAsync();
             return TypedResults.Ok();
+        }
+
+        [HttpPost("ForgotPassword")]
+        public async Task<Results<Ok, ValidationProblem>> ForgotPassword([FromBody] ForgotPasswordRequest resetRequest, [FromServices] IServiceProvider sp)
+        {
+            var user = await _userManager.FindByEmailAsync(resetRequest.Email);
+
+            if (user is not null && await _userManager.IsEmailConfirmedAsync(user))
+            {
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+                await _emailService.SendEmailAsync(user.Nome, resetRequest.Email, "Assunto", HtmlEncoder.Default.Encode(code));
+            }
+            // Don't reveal that the user does not exist or is not confirmed, so don't return a 200 if we would have
+            // returned a 400 for an invalid code given a valid user email.
+            return TypedResults.Ok();
+        }
+
+        [HttpPost("ResetPassword")]
+        public async Task<Results<Ok, ValidationProblem>> ResetPassword
+            ([FromBody] ResetPasswordRequest resetRequest, [FromServices] IServiceProvider sp)
+        {
+            var user = await _userManager.FindByEmailAsync(resetRequest.Email);
+
+            if (user is null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            {
+                // Don't reveal that the user does not exist or is not confirmed, so don't return a 200 if we would have
+                // returned a 400 for an invalid code given a valid user email.
+                return CreateValidationProblem(IdentityResult.Failed(_userManager.ErrorDescriber.InvalidToken()));
+            }
+
+            IdentityResult result;
+            try
+            {
+                var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(resetRequest.ResetCode));
+                result = await _userManager.ResetPasswordAsync(user, code, resetRequest.NewPassword);
+            }
+            catch (FormatException)
+            {
+                result = IdentityResult.Failed(_userManager.ErrorDescriber.InvalidToken());
+            }
+
+            if (!result.Succeeded)
+            {
+                return CreateValidationProblem(result);
+            }
+
+            return TypedResults.Ok();
+        }
+
+        [HttpGet("ConfirmEmail", Name = "ConfirmEmail")]
+        async Task<Results<ContentHttpResult, UnauthorizedHttpResult>> ConfirmEmail([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, [FromServices] IServiceProvider sp)
+        {
+            if (await _userManager.FindByIdAsync(userId) is not { } user)
+            {
+                // We could respond with a 404 instead of a 401 like Identity UI, but that feels like unnecessary information.
+                return TypedResults.Unauthorized();
+            }
+
+            try
+            {
+                code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            }
+            catch (FormatException)
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            IdentityResult result;
+
+            if (string.IsNullOrEmpty(changedEmail))
+            {
+                result = await _userManager.ConfirmEmailAsync(user, code);
+            }
+            else
+            {
+                // As with Identity UI, email and user name are one and the same. So when we update the email,
+                // we need to update the user name.
+                result = await _userManager.ChangeEmailAsync(user, changedEmail, code);
+
+                if (result.Succeeded)
+                {
+                    result = await _userManager.SetUserNameAsync(user, changedEmail);
+                }
+            }
+
+            if (!result.Succeeded)
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            return TypedResults.Text("Thank you for confirming your email.");
         }
 
         private static ValidationProblem CreateValidationProblem(IdentityResult result)
@@ -173,7 +266,8 @@ namespace TravelOrganizer.Api.Controllers
             var confirmEmailUrl = linkGenerator.GetUriByName(HttpContext, "email", routeValues)
                 ?? throw new NotSupportedException($"Could not find confirmation email Uri.");
 
-            await _emailService.EnviarEmail(user, email, "assunto" ,HtmlEncoder.Default.Encode(confirmEmailUrl));
+            await _emailService.SendEmailAsync(user.Nome, email, "assunto", HtmlEncoder.Default.Encode(confirmEmailUrl));
         }
     }
 }
+

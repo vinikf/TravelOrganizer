@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TravelOrganizer.Api;
+using TravelOrganizer.Application;
+using TravelOrganizer.Application.Interfaces;
 using TravelOrganizer.Application.Services;
 using TravelOrganizer.Domain.Entities;
 using TravelOrganizer.Infrastructure;
+using TravelOrganizer.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +19,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins(
-                    "http://localhost:5173")
+                    "http://localhost:5173", "https://localhost:44322")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials(); 
@@ -68,8 +71,11 @@ builder.Services.AddIdentityCore<Usuario>()
 builder.Services.AddDbContext<ApplicationDbContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("Database")));
 
-builder.Services.AddScoped<UsuarioLogadoFilter>();
-builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUsuarioContext, UsuarioContext>();
+builder.Services.AddScoped<IViagemApplication, ViagemApplication>();
+builder.Services.AddScoped<IViagemRepository, ViagemRepository>();
 
 var app = builder.Build();
 
