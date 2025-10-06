@@ -19,9 +19,11 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.4" />
+    <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TravelOrganizer.Application\TravelOrganizer.Application.csproj" />
     <ProjectReference Include="..\TravelOrganizer.Domain\TravelOrganizer.Domain.csproj" />
   </ItemGroup>
 

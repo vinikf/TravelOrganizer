@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TravelOrganizer.Application;
+using TravelOrganizer.Application.Interfaces;
 using TravelOrganizer.Domain.DTOs;
+using TravelOrganizer.Domain.Entities;
 
 namespace TravelOrganizer.Api.Controllers
 {
     [Route("api/[controller]")]
     public class ViagensController : BaseController
     {
+        private readonly IViagemApplication _viagemApplication;
 
-        public ViagensController()
+        public ViagensController(IViagemApplication viagemApplication)
         {
+            _viagemApplication = viagemApplication;
         }
 
         [HttpPost("Criar")]
@@ -21,7 +25,7 @@ namespace TravelOrganizer.Api.Controllers
 
             try
             {
-                await new ViagemApplication(UsuarioLogado).CriarViagem(dto);
+                await _viagemApplication.CriarViagem(dto);
                 return Ok();
             }
             catch (Exception)
@@ -35,7 +39,7 @@ namespace TravelOrganizer.Api.Controllers
         {
             try
             {
-                var viagens = await new ViagemApplication(UsuarioLogado).ListarViagens();
+                List<Viagem> viagens = await _viagemApplication.ListarViagens();
                 return Ok(viagens);
             }
             catch (Exception)
