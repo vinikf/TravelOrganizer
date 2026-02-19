@@ -20,14 +20,14 @@ namespace TravelOrganizer.Api.Controllers
     public class AuthController : ControllerBase
     {
         private static readonly EmailAddressAttribute _emailAddressAttribute = new();
-        private readonly UserManager<Usuario> _userManager;
-        private readonly SignInManager<Usuario> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly LinkGenerator linkGenerator;
-        private readonly IUserStore<Usuario> _userStore;
+        private readonly IUserStore<User> _userStore;
         private readonly IOptionsMonitor<BearerTokenOptions> _bearerTokenOptions;
         private readonly IEmailService _emailService;
 
-        public AuthController(UserManager<Usuario> userManager, SignInManager<Usuario> signInManager, LinkGenerator linkGenerator, IUserStore<Usuario> userStore, IOptionsMonitor<BearerTokenOptions> bearerTokenOptions, IEmailService emailService)
+        public AuthController(UserManager<User> userManager, SignInManager<User> signInManager, LinkGenerator linkGenerator, IUserStore<User> userStore, IOptionsMonitor<BearerTokenOptions> bearerTokenOptions, IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -38,14 +38,14 @@ namespace TravelOrganizer.Api.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<Results<Ok, ValidationProblem>> Register(CadastrarUsuarioDTO dto)
+        public async Task<Results<Ok, ValidationProblem>> Register(CreateUserDTO dto)
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException($"Register requires a user store with email support.");
             }
 
-            var emailStore = (IUserEmailStore<Usuario>)_userStore;
+            var emailStore = (IUserEmailStore<User>)_userStore;
             var email = dto.Email;
 
             if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
@@ -53,10 +53,10 @@ namespace TravelOrganizer.Api.Controllers
                 return CreateValidationProblem(IdentityResult.Failed(_userManager.ErrorDescriber.InvalidEmail(email)));
             }
 
-            var user = new Usuario();
-            user.Nome = dto.Nome;
-            user.SobreNome = dto.Sobrenome;
-            user.DataNascimento = dto.DataNascimento;
+            var user = new User();
+            user.Name = dto.Name;
+            user.Lastname = dto.Lastname;
+            user.DateOfBirth = dto.DateOfBirth;
             await _userStore.SetUserNameAsync(user, email, CancellationToken.None);
             await emailStore.SetEmailAsync(user, email, CancellationToken.None);
             var result = await _userManager.CreateAsync(user, dto.Password);
@@ -108,7 +108,7 @@ namespace TravelOrganizer.Api.Controllers
 
             // Reject the /refresh attempt with a 401 if the token expired or the security stamp validation fails
             if (refreshTicket?.Properties?.ExpiresUtc is not { } expiresUtc || DateTime.UtcNow >= expiresUtc ||
-                await _signInManager.ValidateSecurityStampAsync(refreshTicket.Principal) is not Usuario user)
+                await _signInManager.ValidateSecurityStampAsync(refreshTicket.Principal) is not User user)
 
             {
                 return TypedResults.Challenge();
@@ -134,7 +134,7 @@ namespace TravelOrganizer.Api.Controllers
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-                await _emailService.SendEmailAsync(user.Nome, resetRequest.Email, "Assunto", HtmlEncoder.Default.Encode(code));
+                await _emailService.SendEmailAsync(user.Name, resetRequest.Email, "Assunto", HtmlEncoder.Default.Encode(code));
             }
             // Don't reveal that the user does not exist or is not confirmed, so don't return a 200 if we would have
             // returned a 400 for an invalid code given a valid user email.
@@ -243,7 +243,7 @@ namespace TravelOrganizer.Api.Controllers
             return TypedResults.ValidationProblem(errorDictionary);
         }
 
-        private async Task SendConfirmationEmailAsync(Usuario user, string email, bool isChange = false)
+        private async Task SendConfirmationEmailAsync(User user, string email, bool isChange = false)
         {
             var code = isChange
                 ? await _userManager.GenerateChangeEmailTokenAsync(user, email)
@@ -266,7 +266,7 @@ namespace TravelOrganizer.Api.Controllers
             var confirmEmailUrl = linkGenerator.GetUriByName(HttpContext, "email", routeValues)
                 ?? throw new NotSupportedException($"Could not find confirmation email Uri.");
 
-            await _emailService.SendEmailAsync(user.Nome, email, "assunto", HtmlEncoder.Default.Encode(confirmEmailUrl));
+            await _emailService.SendEmailAsync(user.Name, email, "assunto", HtmlEncoder.Default.Encode(confirmEmailUrl));
         }
     }
 }

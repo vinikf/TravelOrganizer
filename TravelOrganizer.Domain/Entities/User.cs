@@ -9,12 +9,12 @@ using TravelOrganizer.Domain.DTOs;
 
 namespace TravelOrganizer.Domain.Entities
 {
-    public class Usuario : IdentityUser<int>
+    public class User : IdentityUser<int>
     {
         [StringLength(100)]
-        public string Nome { get; set; }
+        public string Name { get; set; }
         [StringLength(100)]
-        public string SobreNome { get; set; }
-        public DateTime DataNascimento { get; set; }
+        public string Lastname { get; set; }
+        public DateTime DateOfBirth { get; set; }
     }
 }

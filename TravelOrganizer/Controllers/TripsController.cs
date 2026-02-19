@@ -8,24 +8,24 @@ using TravelOrganizer.Domain.Entities;
 namespace TravelOrganizer.Api.Controllers
 {
     [Route("api/[controller]")]
-    public class ViagensController : BaseController
+    public class TripsController : BaseController
     {
-        private readonly IViagemApplication _viagemApplication;
+        private readonly ITripApplication _tripApplication;
 
-        public ViagensController(IViagemApplication viagemApplication)
+        public TripsController(ITripApplication viagemApplication)
         {
-            _viagemApplication = viagemApplication;
+            _tripApplication = viagemApplication;
         }
 
-        [HttpPost("Criar")]
-        public async Task<IActionResult> CriarViagem([FromBody] NovaViagemDTO dto)
+        [HttpPost("Create")]
+        public async Task<IActionResult> Create([FromBody] TripDTO dto)
         {
             if (dto == null)
                 return BadRequest("Invalid request payload.");
 
             try
             {
-                await _viagemApplication.CriarViagem(dto);
+                await _tripApplication.Create(dto);
                 return Ok();
             }
             catch (Exception)
@@ -34,12 +34,12 @@ namespace TravelOrganizer.Api.Controllers
             }
         }
 
-        [HttpGet("Listar")]
-        public async Task<IActionResult> ListarViagens()
+        [HttpGet("List")]
+        public async Task<IActionResult> List()
         {
             try
             {
-                List<Viagem> viagens = await _viagemApplication.ListarViagens();
+                List<Trip> viagens = await _tripApplication.List();
                 return Ok(viagens);
             }
             catch (Exception)

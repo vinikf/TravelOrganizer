@@ -9,6 +9,6 @@ namespace TravelOrganizer.Api.Controllers
     [ApiController]
     public abstract class BaseController : ControllerBase
     {
-        public UsuarioLogadoDTO UsuarioLogado { get; set; }
+        public LoggedUserDTO LoggedUser { get; set; }
     }
 }

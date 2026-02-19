@@ -23,7 +23,7 @@ namespace TravelOrganizer.Infrastructure.Services
         {
             var templateFile = Path.Combine(_templatesPath, $"{templateName}.html");
             if (!File.Exists(templateFile))
-                throw new FileNotFoundException($"Template {templateName}.html não encontrado.");
+                throw new FileNotFoundException($"Template {templateName}.html not found.");
 
             var body = await File.ReadAllTextAsync(templateFile);
 

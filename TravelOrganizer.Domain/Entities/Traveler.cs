@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace TravelOrganizer.Domain.Entities
 {
-    public class Viajante
+    public class Traveler
     {
         public int Id { get; set; }
         [StringLength(100)]
-        public string Nome { get; set; }
-        public int Idade { get; set; }
-        public bool NecessitaAcessibilidade { get; set; }
+        public string Name { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public bool SpecialNeeds { get; set; }
     }
 }
