@@ -12,9 +12,9 @@ namespace TravelOrganizer.Api.Controllers
     {
         private readonly ITripApplication _tripApplication;
 
-        public TripsController(ITripApplication viagemApplication)
+        public TripsController(ITripApplication tripApplication)
         {
-            _tripApplication = viagemApplication;
+            _tripApplication = tripApplication;
         }
 
         [HttpPost("Create")]
@@ -39,8 +39,8 @@ namespace TravelOrganizer.Api.Controllers
         {
             try
             {
-                List<Trip> viagens = await _tripApplication.List();
-                return Ok(viagens);
+                List<Trip> trips = await _tripApplication.List();
+                return Ok(trips);
             }
             catch (Exception)
             {
