@@ -2,8 +2,8 @@
 
 namespace TravelOrganizer.Application.Interfaces
 {
-    public interface IUsuarioContext
+    public interface IUserContext
     {
-        UsuarioLogadoDTO Usuario { get; }
+        LoggedUserDTO User { get; }
     }
 }

@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace TravelOrganizer.Domain.DTOs
 {
-    public class CadastrarUsuarioDTO
+    public class CreateUserDTO
     {
         [Required]
-        public string Nome { get; set; }
-        public string Sobrenome { get; set; }
+        public string Name { get; set; }
+        public string Lastname { get; set; }
         [Required]
         public string Email { get; set; }
         [Required]
         public string Password { get; set; }
         [Required]
-        public DateTime DataNascimento { get; set; }
+        public DateTime DateOfBirth { get; set; }
     }
 }

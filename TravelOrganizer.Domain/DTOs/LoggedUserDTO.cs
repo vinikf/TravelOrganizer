@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace TravelOrganizer.Domain.DTOs
 {
-    public class UsuarioLogadoDTO
+    public class LoggedUserDTO
     {
         public int Id { get; set; }
-        public string Nome { get; set; }
+        public string Name { get; set; }
         public string Email { get; set; }
     }
 }

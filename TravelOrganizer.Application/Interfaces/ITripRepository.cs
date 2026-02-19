@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TravelOrganizer.Api.Controllers;
 using TravelOrganizer.Domain.Entities;
 
 namespace TravelOrganizer.Application.Interfaces
 {
-    public interface IViagemApplication
+    public interface ITripRepository
     {
-        Task CriarViagem(NovaViagemDTO dto);
-        Task<List<Viagem>> ListarViagens();
+        Task Create(Trip trip);
+        Task<List<Trip>> List(int userId);
     }
 }

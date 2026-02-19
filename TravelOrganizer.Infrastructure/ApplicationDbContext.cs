@@ -6,7 +6,7 @@ using TravelOrganizer.Domain.Entities;
 
 namespace TravelOrganizer.Infrastructure
 {
-    public class ApplicationDbContext : IdentityDbContext<Usuario, IdentityRole<int>, int>
+    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         private static readonly Lazy<IConfiguration> Configuration = new(() =>
             new ConfigurationBuilder()
@@ -23,9 +23,9 @@ namespace TravelOrganizer.Infrastructure
         {
         }
 
-        public DbSet<Viagem> Viagens { get; set; }
-        public DbSet<Viajante> Viajantes { get; set; }
-        public DbSet<Roteiro> Roteiros { get; set; }
+        public DbSet<Trip> Trips { get; set; }
+        public DbSet<Traveler> Travelers { get; set; }
+        public DbSet<Itinerary> Itineraries { get; set; }
     }
 }
 

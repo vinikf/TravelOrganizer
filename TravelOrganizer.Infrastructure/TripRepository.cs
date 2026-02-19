@@ -10,25 +10,25 @@ using TravelOrganizer.Domain.Entities;
 
 namespace TravelOrganizer.Infrastructure
 {
-    public class ViagemRepository : IViagemRepository
+    public class TripRepository : ITripRepository
     {
         private readonly ApplicationDbContext _db;
 
-        public ViagemRepository(ApplicationDbContext db)
+        public TripRepository(ApplicationDbContext db)
         {
             _db = db;
         }
 
-        public async Task Salvar(Viagem viagem)
+        public async Task Create(Trip viagem)
         {
-            _db.Viagens.Add(viagem);
+            _db.Trips.Add(viagem);
             await _db.SaveChangesAsync();
         }
 
-        public async Task<List<Viagem>> ObterTodas(int usuarioId)
+        public async Task<List<Trip>> List(int usuarioId)
         {
-            return await _db.Viagens
-                            .Where(v => v.UsuarioId == usuarioId)
+            return await _db.Trips
+                            .Where(v => v.UserId == usuarioId)
                             .ToListAsync();
         }
     }

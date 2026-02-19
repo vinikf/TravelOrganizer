@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 
 namespace TravelOrganizer.Domain.Entities
 {
-    public class Roteiro
+    public class Itinerary
     {
         public int Id { get; set; }
-        public DateTime Dia { get; set; }
+        public DateTime Day { get; set; }
         [StringLength(8000)]
-        public string Descricao { get; set; }
+        public string Description { get; set; }
 
-        public Roteiro(DateTime dia, string descricao)
+        public Itinerary(DateTime day, string description)
         {
-            Dia = dia;
-            Descricao = descricao;
+            Day = day;
+            Description = description;
         }
     }
 }

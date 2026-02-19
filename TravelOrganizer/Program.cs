@@ -15,7 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: "MyPolicy",
+    options.AddPolicy(name: "TravelPolicy",
         policy =>
         {
             policy.WithOrigins(
@@ -27,7 +27,7 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new() { Title = "Embarquei API", Version = "v1" });
+    options.SwaggerDoc("v1", new() { Title = "TravelOrganizer API", Version = "v1" });
 
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
@@ -36,7 +36,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT", 
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Insira o token no formato: Bearer {seu_token}"
+        Description = "Insira o token no formato: {seu_token}"
     });
 
     options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
@@ -64,7 +64,7 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(IdentityConstants.ApplicationScheme)
 .AddBearerToken(IdentityConstants.BearerScheme);
 
-builder.Services.AddIdentityCore<Usuario>()
+builder.Services.AddIdentityCore<User>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
 
@@ -73,9 +73,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IUsuarioContext, UsuarioContext>();
-builder.Services.AddScoped<IViagemApplication, ViagemApplication>();
-builder.Services.AddScoped<IViagemRepository, ViagemRepository>();
+builder.Services.AddScoped<IUserContext, UserContext>();
+builder.Services.AddScoped<ITripApplication, TripApplication>();
+builder.Services.AddScoped<ITripRepository, TripRepository>();
 
 var app = builder.Build();
 
@@ -88,7 +88,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("MyPolicy");
+app.UseCors("TravelPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
