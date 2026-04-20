@@ -1,6 +1,6 @@
 ﻿using TravelOrganizer.Domain.Entities;
 
-namespace TravelOrganizer.Api.Controllers
+namespace TravelOrganizer.Domain.DTOs
 {
     public class TripDTO
     {

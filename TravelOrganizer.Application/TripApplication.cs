@@ -1,7 +1,6 @@
-﻿using TravelOrganizer.Api.Controllers;
-using TravelOrganizer.Application.Interfaces;
-using TravelOrganizer.Domain.DTOs;
+﻿using TravelOrganizer.Application.Interfaces;
 using TravelOrganizer.Domain.Entities;
+using TravelOrganizer.Domain.DTOs;
 
 namespace TravelOrganizer.Application
 {
@@ -18,15 +17,16 @@ namespace TravelOrganizer.Application
 
         public async Task Create(TripDTO dto)
         {
-            var trip = new Trip
+            var trip = new Trip(dto.Name, dto.StartDate, dto.EndDate, _userContext.User.Id);
+            
+            foreach (var traveler in dto.Travelers)
             {
-                Name = dto.Name,
-                EndDate = dto.EndDate,
-                StartDate = dto.StartDate,
-                Itineraries = dto.Itineraries,
-                UserId = _userContext.User.Id,
-                Travelers = dto.Travelers
-            };
+                trip.AddTraveler(traveler);
+            }
+            foreach (var itinerary in dto.Itineraries)
+            {
+                trip.AddItinerary(itinerary);
+            }
 
             await _tripRepository.Create(trip);
         }

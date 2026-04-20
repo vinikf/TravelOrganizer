@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using TravelOrganizer.Application.Interfaces;
-using TravelOrganizer.Domain.DTOs;
 using TravelOrganizer.Domain.Entities;
 
 namespace TravelOrganizer.Infrastructure
@@ -19,16 +13,16 @@ namespace TravelOrganizer.Infrastructure
             _db = db;
         }
 
-        public async Task Create(Trip viagem)
+        public async Task Create(Trip trip)
         {
-            _db.Trips.Add(viagem);
+            await _db.Trips.AddAsync(trip);
             await _db.SaveChangesAsync();
         }
 
-        public async Task<List<Trip>> List(int usuarioId)
+        public async Task<List<Trip>> List(int userId)
         {
             return await _db.Trips
-                            .Where(v => v.UserId == usuarioId)
+                            .Where(v => v.UserId == userId)
                             .ToListAsync();
         }
     }

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using TravelOrganizer.Api;
 using TravelOrganizer.Application;
 using TravelOrganizer.Application.Interfaces;
 using TravelOrganizer.Application.Services;
@@ -54,7 +53,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-
 
 builder.Services.AddAuthentication(options =>
 {
